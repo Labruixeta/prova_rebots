@@ -28,11 +28,11 @@ public class ControlEsfera : MonoBehaviour {
             {
                 float escala = 0.05f;
                 GetComponent<Transform>().localScale = new Vector3(GetComponent<Transform>().localScale.x + escala, GetComponent<Transform>().localScale.y + escala, GetComponent<Transform>().localScale.z + escala);
-
                 if (GetComponent<Transform>().localScale.x > 0.9f)
                 {
                     estatesfera = EstatEsfera.Creix;
-                    GetComponent<Rigidbody> ().velocity = new Vector2 (Random.Range(-2f,2f),Random.Range(-2f,2f));
+                    float velocitat = 0.2f;
+                    GetComponent<Rigidbody> ().velocity = new Vector2 (Random.Range(-velocitat,velocitat),Random.Range(-velocitat,velocitat));
                 }
                 contador = 0;
             }
@@ -40,7 +40,7 @@ public class ControlEsfera : MonoBehaviour {
         //---------------------------------------------------------------------------------
         //                                      CREIXEMENT
         //---------------------------------------------------------------------------------
-       else if (estatesfera == EstatEsfera.Creix)
+        else if (estatesfera == EstatEsfera.Creix)
         {
             contador++;
             if (contador == 10)
@@ -64,29 +64,30 @@ public class ControlEsfera : MonoBehaviour {
         {
             if (!part)
             {
-               // GetComponent<Rigidbody>().velocity = new Vector2(0f,0f);
+                // GetComponent<Rigidbody>().velocity = new Vector2(0f,0f);
+                GetComponent<SphereCollider>().enabled = false;
                 posicio = transform.position;
-               // posicio = new Vector3(posicio.x + 0.2f, posicio.y + 0.2f, posicio.z);
+                Instantiate(esfera, posicio, Quaternion.identity);
+                posicio = new Vector3(posicio.x + 0.2f, posicio.y + 0.2f, posicio.z);
+                Instantiate(esfera, posicio, Quaternion.identity);
                 part = true;
             }
             else
             {
-                float escala = -0.01f;
+                float escala = 0.002f;
                 GetComponent<Transform>().localScale = new Vector3(GetComponent<Transform>().localScale.x + escala, GetComponent<Transform>().localScale.y + escala, GetComponent<Transform>().localScale.z + escala);
-                if (GetComponent<Transform>().localScale.x<1.01f)
+                //GetComponent<Material>().color = new Vector4(GetComponent<Material>().color.r, GetComponent<Material>().color.g, GetComponent<Material>().color.b, GetComponent<Material>().color.a - 0.05f);
+                if (GetComponent<Transform>().localScale.x>1.8f)
                 {
-                    Instantiate(esfera, posicio, Quaternion.identity);
                     //  GetComponent<Rigidbody>().velocity = new Vector2(Random.Range(-2f, 2f), Random.Range(-2f, 2f));
-                    estatesfera = EstatEsfera.Creix;
+                    estatesfera = EstatEsfera.Mort;
                 }
             }
-        }else if (estatesfera==EstatEsfera.Mort)
+        }
+
+        else if (estatesfera==EstatEsfera.Mort)
         {
-            contador++;
-            if (contador==10)
-            {
-                Destroy(gameObject);
-            }
+             Destroy(gameObject);
         }
     }
 }
