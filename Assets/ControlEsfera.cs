@@ -4,16 +4,16 @@ using UnityEngine;
 public enum EstatEsfera {Neix,Creix,Repro,Mort}
 
 public class ControlEsfera : MonoBehaviour {
-    public int contador = 1;
+    public int contador = 0;
     public Vector3 posicio;
     public GameObject esfera;
+    public bool part = false;
     public EstatEsfera estatesfera = EstatEsfera.Neix;
 
     void Start ()
     {
         esfera = Resources.Load<GameObject>("Sphere");
         GetComponent<Transform>().localScale = new Vector3(0f, 0f, 0f);
-        //GetComponent<Rigidbody> ().velocity = new Vector2 (Random.Range(-5f,5f),Random.Range(-5f,5f));
 	}
 	
 	void Update ()
@@ -26,14 +26,15 @@ public class ControlEsfera : MonoBehaviour {
             contador++;
             if (contador == 10)
             {
-                GetComponent<Transform>().localScale = new Vector3(GetComponent<Transform>().localScale.x + 0.1f, GetComponent<Transform>().localScale.y + 0.1f, GetComponent<Transform>().localScale.z + 0.1f);
+                float escala = 0.05f;
+                GetComponent<Transform>().localScale = new Vector3(GetComponent<Transform>().localScale.x + escala, GetComponent<Transform>().localScale.y + escala, GetComponent<Transform>().localScale.z + escala);
 
                 if (GetComponent<Transform>().localScale.x > 0.9f)
                 {
                     estatesfera = EstatEsfera.Creix;
                     GetComponent<Rigidbody> ().velocity = new Vector2 (Random.Range(-2f,2f),Random.Range(-2f,2f));
                 }
-                contador = 1;
+                contador = 0;
             }
         }
         //---------------------------------------------------------------------------------
@@ -45,11 +46,15 @@ public class ControlEsfera : MonoBehaviour {
             if (contador == 10)
             {
                 GetComponent<Transform>().localScale = new Vector3(GetComponent<Transform>().localScale.x * 1.005f, GetComponent<Transform>().localScale.y * 1.005f, GetComponent<Transform>().localScale.z * 1.005f);
-                if (GetComponent<Transform>().localScale.x > 1.5f)
+                if (GetComponent<Transform>().localScale.x > 1.5f && !part)
                 {
                     estatesfera = EstatEsfera.Repro;
                 }
-                contador = 1;
+                if (GetComponent<Transform>().localScale.x > 2.0f && part)
+                {
+                    estatesfera = EstatEsfera.Mort;
+                }
+                    contador = 0;
             }
         }
         //---------------------------------------------------------------------------------
@@ -57,11 +62,31 @@ public class ControlEsfera : MonoBehaviour {
         //---------------------------------------------------------------------------------
         else if (estatesfera == EstatEsfera.Repro)
         {
+            if (!part)
+            {
+               // GetComponent<Rigidbody>().velocity = new Vector2(0f,0f);
                 posicio = transform.position;
-                posicio = new Vector3(posicio.x + 0.2f, posicio.y + 0.2f, posicio.z);
-                Instantiate(esfera, posicio, Quaternion.identity);
-                GetComponent<Transform>().localScale = new Vector3(1f, 1f, 1f);
-                estatesfera = EstatEsfera.Creix;
+               // posicio = new Vector3(posicio.x + 0.2f, posicio.y + 0.2f, posicio.z);
+                part = true;
+            }
+            else
+            {
+                float escala = -0.01f;
+                GetComponent<Transform>().localScale = new Vector3(GetComponent<Transform>().localScale.x + escala, GetComponent<Transform>().localScale.y + escala, GetComponent<Transform>().localScale.z + escala);
+                if (GetComponent<Transform>().localScale.x<1.01f)
+                {
+                    Instantiate(esfera, posicio, Quaternion.identity);
+                    //  GetComponent<Rigidbody>().velocity = new Vector2(Random.Range(-2f, 2f), Random.Range(-2f, 2f));
+                    estatesfera = EstatEsfera.Creix;
+                }
+            }
+        }else if (estatesfera==EstatEsfera.Mort)
+        {
+            contador++;
+            if (contador==10)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }
